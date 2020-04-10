@@ -1,4 +1,4 @@
-# Base Image - Postgres
+# Base Image - https://hub.docker.com/r/banst/awscli
 FROM banst/awscli
 
 
