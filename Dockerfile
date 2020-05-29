@@ -1,18 +1,31 @@
-# Base Image - ubuntu (AWS CLI v2 isn't supported in Alpine Linux)
-FROM ubuntu:latest
+FROM alpine:3.10
 
-RUN apt-get update
-RUN apt-get -y install curl unzip
+ENV TERRAFORM_VERSION=0.12.25
 
-# Download and install AWS CLI v2
-RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-RUN unzip awscliv2.zip
-RUN ./aws/install
+VOLUME ["/data"]
 
-# Download and install Terraform
-RUN curl "https://releases.hashicorp.com/terraform/0.12.24/terraform_0.12.24_linux_amd64.zip" -o "terraform_0.12.24_linux_amd64.zip"
-RUN unzip terraform_0.12.24_linux_amd64.zip
-RUN mv terraform /usr/local/bin/terraform
+WORKDIR /data
 
-RUN aws --version
-RUN terraform version
+ENTRYPOINT ["/usr/bin/terraform"]
+
+CMD ["--help"]
+
+RUN apk update && \
+  apk add curl jq python bash ca-certificates git openssl unzip wget gettext && \
+  cd /tmp && \
+  wget https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip && \
+  unzip terraform_${TERRAFORM_VERSION}_linux_amd64.zip -d /usr/bin && \
+  wget https://dl.google.com/dl/cloudsdk/channels/rapid/google-cloud-sdk.zip -O /tmp/google-cloud-sdk.zip && \
+  cd /usr/local && unzip /tmp/google-cloud-sdk.zip && \
+  google-cloud-sdk/install.sh --usage-reporting=false --path-update=true --bash-completion=true && \
+  google-cloud-sdk/bin/gcloud config set --installation component_manager/disable_update_check true && \
+  rm -rf /tmp/* && \
+  rm -rf /var/cache/apk/* && \
+  rm -rf /var/tmp/*
+
+ENV PATH = $PATH:/usr/local/google-cloud-sdk/bin/
+
+ARG VCS_REF
+
+LABEL org.label-schema.vcs-ref=$VCS_REF \
+  org.label-schema.vcs-url="https://github.com/broadinstitute/docker-terraform"
