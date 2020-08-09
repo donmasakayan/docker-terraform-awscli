@@ -10,8 +10,8 @@ RUN unzip awscliv2.zip
 RUN ./aws/install
 
 # Download and install Terraform
-RUN curl "https://releases.hashicorp.com/terraform/0.12.24/terraform_0.12.24_linux_amd64.zip" -o "terraform_0.12.24_linux_amd64.zip"
-RUN unzip terraform_0.12.24_linux_amd64.zip
+RUN curl "https://releases.hashicorp.com/terraform/0.12.29/terraform_0.12.29_linux_amd64.zip" -o "terraform_0.12.29_linux_amd64.zip"
+RUN unzip terraform_0.12.29_linux_amd64.zip
 RUN mv terraform /usr/local/bin/terraform
 
 RUN aws --version
